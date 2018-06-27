@@ -13,3 +13,8 @@ git clone "https://github.com/Jean-Baptiste-Lasselle/dockerized-nfs-server" .
 sudo chmod +x ./operations.sh
 ./operations.sh
 ```
+
+
+# ANNEXE: références
+
+* https://www.howtoforge.com/tutorial/setting-up-an-nfs-server-and-client-on-centos-7/
