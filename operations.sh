@@ -69,6 +69,11 @@ NOMFICHIERLOG="$(pwd)/provision-nfs-server-dock.log"
 ######### -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -
 ######### -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -# -
 
+export REPERTOIRES_APP_DANS_HOTE_DOCKER=$(pwd)/repertoires/de/logging
+export REPERTOIRE_APP1_DANS_HOTE_DOCKER=$REPERTOIRES_APP_DANS_HOTE_DOCKER/application-1
+export REPERTOIRES_LOGS_APPS_DANS_NFS_SERVER=/repertoires/de/logging
+export REPERTOIRE_APP1_DANS_NFS_SERVER=$REPERTOIRES_LOGS_APPS_DANS_NFS_SERVER/application-1
+export REPERTOIRE_APP2_DANS_NFS_SERVER=$REPERTOIRES_LOGS_APPS_DANS_NFS_SERVER/application-2
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 ##############################################################################################################################################
@@ -152,28 +157,91 @@ synchroniserSurServeurNTP () {
 
 
 
-echo " +++provision+ conteneur + nfs-server +  COMMENCEE  - " >> $NOMFICHIERLOG
+echo " +++provision+ conteneur + nfs-server +  COMMENCEE  - "
 
 # configurerServeurNTP
 synchroniserSurServeurNTP
 
+mkdir -p $REPERTOIRE_APP1_DANS_HOTE_DOCKER
 
+# --------------------------------------- #
+# --------------------------------------- #
+# -------   CONTENEUR NFS-SERVER   ------ #
+# --------------------------------------- #
+# --------------------------------------- #
 
 # - BUILD IMAGE NFS-SERVER
 export MAISON_MERE=`pwd`
-export CONTEXTE_DU_BUILD_DOCKER=$MAISON/application-1/bdd/mariadb
-export NOM_IMAGE_DOCKER_SGBDR=bytes.io/nfs-server:1.0.0
+export CONTEXTE_DU_BUILD_DOCKER=$MAISON_OPERATIONS/conteneurs/nfs-server/
+# export CONTEXTE_DU_BUILD_DOCKER=$MAISON_OPERATIONS/conteneurs/tomcat/
+# export CONTEXTE_DU_BUILD_DOCKER=$MAISON_OPERATIONS/conteneurs/tomcat/tomcat-with-nfs-share.dockerfile
+export NOM_IMAGE_DOCKER_NFS_SERVER=bytes.io/nfs-server:1.0.0
 cd $CONTEXTE_DU_BUILD_DOCKER
 clear
 pwd
-generer_fichiers
-sudo docker build --tag $NOM_IMAGE_DOCKER_SGBDR -f ./nfs-server.dockerfile $CONTEXTE_DU_BUILD_DOCKER
-cd $MAISON
 
+sudo docker build --tag $NOM_IMAGE_DOCKER_NFS_SERVER -f ./nfs-server.dockerfile $CONTEXTE_DU_BUILD_DOCKER
+cd $MAISON_OPERATIONS
 
+# - RUN CONTENEUR NFS-SERVER
 # Construction des répertoires pour le logging de chaque application dans l'hôtes docker
+# - 
+# Utilisation
+# -
+
+# export REPERTOIRES_APP_DANS_HOTE_DOCKER=$(pwd)/repertoires/de/logging
+# export REPERTOIRE_APP1_DANS_HOTE_DOCKER=$REPERTOIRES_APP_DANS_HOTE_DOCKER/application-1
+
+# - 
+# - Pour chaque application, on substitue, dans le dockerfile, la valeur du chemin des répertoires contenant les fichiers de logs  
+# - 
+sed -i "s/VAL_REPERTOIRE_APP1_DANS_HOTE_DOCKER/$REPERTOIRE_APP1_DANS_NFS_SERVER/g" $MAISON_OPERATIONS/conteneurs/tomcat/nfs-server.dockerfile
+# 
+# sudo docker run --publish-all=true -v $REPERTOIRE_APP1_DANS_HOTE_DOCKER:/repertoires/de/logging/application-1 -v $REPERTOIRE_APP2_DANS_HOTE_DOCKER:/repertoires/de/logging/application-2   ....
+# sudo docker run --name conteneur-jbl-nfs-server ---restart=always --publish-all=true -v $REPERTOIRE_APP1_DANS_HOTE_DOCKER:$REPERTOIRE_APP1_DANS_NFS_SERVER  -d $NOM_IMAGE_DOCKER_NFS_SERVER
+sudo docker run --name conteneur-jbl-nfs-server ---restart=always --publish-all=true -d $NOM_IMAGE_DOCKER_NFS_SERVER
+# -
+
+
+
+# --------------------------------------- #
+# --------------------------------------- #
+# ------- CONTENEUR TOMCAT LOGUEUR ------ #
+# --------------------------------------- #
+# --------------------------------------- #
+
+# - BUILD IMAGE NFS-SERVER
+export CONTEXTE_DU_BUILD_DOCKER=$MAISON_OPERATIONS/conteneurs/tomcat/
+# export CONTEXTE_DU_BUILD_DOCKER=$MAISON_OPERATIONS/conteneurs/tomcat/tomcat-with-nfs-share.dockerfile
+export NOM_IMAGE_DOCKER_TOMCAT_LOGS=bytes.io/tomcat-logueur:1.0.0
+cd $CONTEXTE_DU_BUILD_DOCKER
+clear
+pwd
+
+sudo docker build --tag $NOM_IMAGE_DOCKER_TOMCAT_LOGS -f ./tomcat-with-nfs-share.dockerfile $CONTEXTE_DU_BUILD_DOCKER
+cd $MAISON_OPERATIONS
+
+# - RUN CONTENEUR NFS-SERVER
+# Construction des répertoires pour le logging de chaque application dans l'hôtes docker
+# - 
+# Utilisation
+# - 
+
+# export REPERTOIRES_APP_DANS_HOTE_DOCKER=$(pwd)/repertoires/de/logging
+# export REPERTOIRE_APP1_DANS_HOTE_DOCKER=$REPERTOIRES_APP_DANS_HOTE_DOCKER/application-1
+
+# - 
+# - Pour chaque application, on substitue, dans le dockerfile, la valeur du chemin des répertoires contenant les fichiers de logs  
+# - 
+sed -i "s/VAL_REPERTOIRE_APP1_DANS_NFS_SERVER/$REPERTOIRE_APP1_DANS_NFS_SERVER/g" $MAISON_OPERATIONS/conteneurs/tomcat/tomcat-with-nfs-share.dockerfile
+# 
+sudo docker run --name conteneur-tomcat-nfs-logs ---restart=always --publish-all=true -v $REPERTOIRE_APP1_DANS_HOTE_DOCKER:/usr/local/tomcat/logs  -d $NOM_IMAGE_DOCKER_TOMCAT_LOGS
+# -
+
+
+
 
 
 # - Construire un conteneur tomcat dans lequel on va faire un partage NFS
 
-echo " +++provision+ conteneur + nfs-server +  TERMINEE  - " >> $NOMFICHIERLOG
+echo " +++provision+ conteneur + nfs-server +  TERMINEE  - "

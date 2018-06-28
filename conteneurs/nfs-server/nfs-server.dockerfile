@@ -15,17 +15,20 @@ RUN yum update -y && yum install -y nfs-utils nfs-utils-lib
 
 
 # + Les répertoires de logging de chaque application : ceux donc, qui vont être servis.
-RUN mkdir -p /repertoires/de/logging/application-1
-RUN mkdir -p /repertoires/de/logging/application-2
-RUN mkdir -p /repertoires/de/logging/application-3
-# on configure les droits voulus par le serveurs NFS, sur ces 3 répertoires
-RUN chown nfsnobody:nfsnobody /repertoires/de/logging/application-*
-RUN chmod 755 /repertoires/de/logging/application-*
+# RUN mkdir -p /repertoires/de/logging/application-1
+RUN mkdir -p VAL_REPERTOIRE_APP1_DANS_NFS_SERVER
+# RUN mkdir -p /repertoires/de/logging/application-2
+# RUN mkdir -p /repertoires/de/logging/application-3
+# - on configure les droits voulus par le serveurs NFS, sur ces 3 répertoires
+# RUN chown nfsnobody:nfsnobody /repertoires/de/logging/application-*
+RUN chown nfsnobody:nfsnobody VAL_REPERTOIRE_APP1_DANS_NFS_SERVER
+RUN chmod 755 VAL_REPERTOIRE_APP1_DANS_NFS_SERVER
 
 # + On fait la configuration /etc/exports
-RUN echo "/repertoires/de/logging/application-1 locahost (rw,sync,no_subtree_check)" >> /etc/exports
-RUN echo "/repertoires/de/logging/application-2 locahost (rw,sync,no_subtree_check)" >> /etc/exports
-RUN echo "/repertoires/de/logging/application-3 locahost (rw,sync,no_subtree_check)" >> /etc/exports
+RUN echo "VAL_REPERTOIRE_APP1_DANS_NFS_SERVER 192.168.1.0/24 (rw,sync,no_subtree_check)" >> /etc/exports
+# RUN echo "/repertoires/de/logging/application-1 localhost (rw,sync,no_subtree_check)" >> /etc/exports
+# RUN echo "/repertoires/de/logging/application-2 localhost (rw,sync,no_subtree_check)" >> /etc/exports
+# RUN echo "/repertoires/de/logging/application-3 localhost (rw,sync,no_subtree_check)" >> /etc/exports
 # + On applique l'export
 RUN exportfs -a
 

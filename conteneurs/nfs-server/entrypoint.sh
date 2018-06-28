@@ -89,4 +89,4 @@
 systemctl start rpcbind
 systemctl start nfs-server
 
-echo " +++provision+ conteneur + nfs-server +  TERMINEE  - " >> $NOMFICHIERLOG
+echo " +++provision+ conteneur + nfs-server +  TERMINEE  - "
