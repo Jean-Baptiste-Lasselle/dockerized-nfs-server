@@ -180,6 +180,11 @@ cd $CONTEXTE_DU_BUILD_DOCKER
 clear
 pwd
 
+# - 
+# - Pour chaque application, on substitue, dans le dockerfile, la valeur du chemin des répertoires contenant les fichiers de logs  
+# - 
+sed -i "s/VAL_REPERTOIRE_APP1_DANS_NFS_SERVER/$REPERTOIRE_APP1_DANS_NFS_SERVER/g" $MAISON_OPERATIONS/conteneurs/tomcat/nfs-server.dockerfile
+
 sudo docker build --tag $NOM_IMAGE_DOCKER_NFS_SERVER -f ./nfs-server.dockerfile $CONTEXTE_DU_BUILD_DOCKER
 cd $MAISON_OPERATIONS
 
@@ -192,10 +197,7 @@ cd $MAISON_OPERATIONS
 # export REPERTOIRES_APP_DANS_HOTE_DOCKER=$(pwd)/repertoires/de/logging
 # export REPERTOIRE_APP1_DANS_HOTE_DOCKER=$REPERTOIRES_APP_DANS_HOTE_DOCKER/application-1
 
-# - 
-# - Pour chaque application, on substitue, dans le dockerfile, la valeur du chemin des répertoires contenant les fichiers de logs  
-# - 
-sed -i "s/VAL_REPERTOIRE_APP1_DANS_HOTE_DOCKER/$REPERTOIRE_APP1_DANS_NFS_SERVER/g" $MAISON_OPERATIONS/conteneurs/tomcat/nfs-server.dockerfile
+
 # 
 # sudo docker run --publish-all=true -v $REPERTOIRE_APP1_DANS_HOTE_DOCKER:/repertoires/de/logging/application-1 -v $REPERTOIRE_APP2_DANS_HOTE_DOCKER:/repertoires/de/logging/application-2   ....
 # sudo docker run --name conteneur-jbl-nfs-server ---restart=always --publish-all=true -v $REPERTOIRE_APP1_DANS_HOTE_DOCKER:$REPERTOIRE_APP1_DANS_NFS_SERVER  -d $NOM_IMAGE_DOCKER_NFS_SERVER
@@ -203,7 +205,7 @@ sudo docker run --name conteneur-jbl-nfs-server ---restart=always --publish-all=
 # -
 
 
-
+VAL_REPERTOIRE_APP1_DANS_NFS_SERVER
 # --------------------------------------- #
 # --------------------------------------- #
 # ------- CONTENEUR TOMCAT LOGUEUR ------ #
@@ -218,6 +220,11 @@ cd $CONTEXTE_DU_BUILD_DOCKER
 clear
 pwd
 
+# - 
+# - Pour chaque application, on substitue, dans le dockerfile, la valeur du chemin des répertoires contenant les fichiers de logs  
+# - 
+sed -i "s/VAL_REPERTOIRE_APP1_DANS_NFS_SERVER/$REPERTOIRE_APP1_DANS_NFS_SERVER/g" $MAISON_OPERATIONS/conteneurs/tomcat/tomcat-with-nfs-share.dockerfile
+
 sudo docker build --tag $NOM_IMAGE_DOCKER_TOMCAT_LOGS -f ./tomcat-with-nfs-share.dockerfile $CONTEXTE_DU_BUILD_DOCKER
 cd $MAISON_OPERATIONS
 
@@ -230,11 +237,7 @@ cd $MAISON_OPERATIONS
 # export REPERTOIRES_APP_DANS_HOTE_DOCKER=$(pwd)/repertoires/de/logging
 # export REPERTOIRE_APP1_DANS_HOTE_DOCKER=$REPERTOIRES_APP_DANS_HOTE_DOCKER/application-1
 
-# - 
-# - Pour chaque application, on substitue, dans le dockerfile, la valeur du chemin des répertoires contenant les fichiers de logs  
-# - 
-sed -i "s/VAL_REPERTOIRE_APP1_DANS_NFS_SERVER/$REPERTOIRE_APP1_DANS_NFS_SERVER/g" $MAISON_OPERATIONS/conteneurs/tomcat/tomcat-with-nfs-share.dockerfile
-# 
+
 sudo docker run --name conteneur-tomcat-nfs-logs ---restart=always --publish-all=true -v $REPERTOIRE_APP1_DANS_HOTE_DOCKER:/usr/local/tomcat/logs  -d $NOM_IMAGE_DOCKER_TOMCAT_LOGS
 # -
 

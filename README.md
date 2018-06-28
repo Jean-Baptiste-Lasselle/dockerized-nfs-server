@@ -23,3 +23,10 @@ mkdir provision-nfs-server && cd provision-nfs-server && git clone "https://gith
 # ANNEXE: références
 
 * https://www.howtoforge.com/tutorial/setting-up-an-nfs-server-and-client-on-centos-7/
+
+
+# ANNEXE: diverses notes
+
+```
+exportfs: No host name given with VAL_REPERTOIRE_APP1_DANS_NFS_SERVER (rw,sync,no_subtree_check), suggest *(rw,sync,no_subtree_check)
+```
