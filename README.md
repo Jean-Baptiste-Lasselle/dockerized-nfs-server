@@ -99,3 +99,12 @@ drwx------. 6 jibl jibl 4096 18 juin  01:26 ..
 [jibl@pc-65 ~]$
 
 ```
+
+ANNEXE ?
+Donc l'idée est:
+
+Je créée  un volume pour chaque Pod Kubernetes, et le partage entre tous les conteneurs du même pod. Donc j'ai un volume par Pod du cluster.
+Je déploie un microservice basé sur un conteneur serveur NFS. Je monte, sur le disuqe dur d'une VM, le répertoire du serveur NFS contenant les fichiers de logs de toutes mes applications,  un sous répertoire par application. Cette VM est de plus un hôte Docker, et je peux créer autant de conteneurs filebeat que d'application, et chaque conteneur filebeat a un volume partagé avec l'hôte Docker. Le répertoire des fichiers de logs de chaque applciation, amené par NFS sur le disque dur de la VM, est contneu dans le répertoire partagé avec le contneur filebeat. le volume est monté en read only, parce que le filebeat n'a pas vocation à modifier de ficheir. 
+
+LA même chose peut être faite avec un conteneuir NFS serveur au lieu d'un microservice NFS, et un volume docker, partagé entre le conteneur de chaque application (émettrice de logs) , et le contneur du serveur NFS.
+Le serveur NFS permet de transporter les fichiers de logs vers des conteneurs Docker dans le même hôte Docker (en fait dans ce cas, on aura simplement recours au partage de volume docker entre 2 conteneurs sur le même hôte Docker) , ou dans un conteneur différent, toujours en montant le partage NFS sur le disque de l'h^te DOcker, et en partageant un volume docker entre un conteneur filebeat, et l'hôte docker.
