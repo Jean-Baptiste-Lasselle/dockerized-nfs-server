@@ -32,7 +32,10 @@ exportfs: No host name given with VAL_REPERTOIRE_APP1_DANS_NFS_SERVER (rw,sync,n
 ```
 
 
-Notons: cidessous, la preuve que lorsque j'utilise l'optio `-v` de la commande `docker run` , les fichiers partagés entre hôte docker, et conteneur, persistent après un arrêt du conteneur.
+Notons: cidessous, la preuve que lorsque j'utilise l'optio `-v` de la commande `docker run` , les fichiers partagés entre hôte docker, et 
+conteneur, persistent:
+* après un arrêt, par `docker stop $NOM_CONTNR` du conteneur.
+* après une destruction complète, par `docker rm $NOM_CONTNR`, du conteneur.
 
 ```
 [jibl@pc-65 ~]$ docker exec -it jibl-test-tomy /bin/bash
@@ -67,6 +70,20 @@ c8e073bcd197        bytes-io/sgbdr:v3   "docker-entrypoint.s…"   About an hour
 c35970bc02f2        tomcat:8.0          "catalina.sh run"        About an hour ago   Up About an hour             0.0.0.0:7852->8080/tcp                                                                           ciblededeploiement-composant-srv-jee
 7f584da0c089        sebp/elk            "/usr/local/bin/star…"   About an hour ago   Up About an hour             0.0.0.0:5044->5044/tcp, 0.0.0.0:5601->5601/tcp, 0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   conteneur-elk-jibl
 [jibl@pc-65 ~]$ docker stop jibl-test-tomy
+jibl-test-tomy
+[jibl@pc-65 ~]$ ls -all ./logs-de-tomy/
+total 28
+drwxrwxr-x. 2 jibl jibl 4096 18 juin  01:32 .
+drwx------. 6 jibl jibl 4096 18 juin  01:26 ..
+-rw-r-----. 1 root root 7798 18 juin  01:33 catalina.2018-06-17.log
+-rw-rw-r--. 1 jibl jibl   15 18 juin  01:30 fichier-ajouter-de-lexterieur.jbl
+-rw-r--r--. 1 root root   22 18 juin  01:32 fichier-crree-ds-conteneur.jbl
+-rw-r-----. 1 root root    0 18 juin  01:29 host-manager.2018-06-17.log
+-rw-r-----. 1 root root  735 18 juin  01:33 localhost.2018-06-17.log
+-rw-r-----. 1 root root    0 18 juin  01:29 localhost_access_log.2018-06-17.txt
+-rw-r-----. 1 root root    0 18 juin  01:29 manager.2018-06-17.log
+[jibl@pc-65 ~]$
+[jibl@pc-65 ~]$ docker rm jibl-test-tomy
 jibl-test-tomy
 [jibl@pc-65 ~]$ ls -all ./logs-de-tomy/
 total 28
